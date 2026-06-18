@@ -35,6 +35,13 @@ table.pages a{color:#185FA5;text-decoration:none;}
 .rank{color:var(--muted);width:22px;}.arr{font-size:10px;}
 .wf{display:inline-block;font-size:10px;font-weight:600;color:#0C447C;background:#E6F1FB;border:1px solid #B5D4F4;border-radius:20px;padding:1px 7px;margin-left:6px;vertical-align:middle;white-space:nowrap;}
 select,button,input[type=date]{font:inherit;font-size:13px;padding:5px 9px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--ink);cursor:pointer;}
+.mmenu{position:absolute;right:0;top:32px;background:#fff;border:1px solid var(--line);border-radius:8px;box-shadow:0 4px 14px rgba(0,0,0,.12);padding:6px;z-index:20;min-width:185px;}
+.mmenu .mhint{font-size:11px;color:var(--muted);padding:4px 6px 6px;}
+.mmenu .mrow{display:flex;align-items:center;gap:2px;border-radius:6px;}
+.mmenu .mrow.dragover{background:#FCE8F1;}
+.mmenu .drag{cursor:grab;color:#B4B2A9;font-size:13px;padding:0 4px;user-select:none;}
+.mmenu label{display:flex;align-items:center;gap:8px;font-size:13px;padding:5px 6px;border-radius:6px;cursor:pointer;white-space:nowrap;flex:1;}
+.mmenu label:hover{background:#F1EFE8;}
 .btnp{background:var(--pink);color:#fff;border-color:var(--pink);}
 .analysis{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;}
 .acard{border-radius:10px;padding:14px 16px;border:1px solid var(--line);}.acard h3{font-size:13px;font-weight:600;margin:0 0 8px;}
@@ -77,6 +84,7 @@ select,button,input[type=date]{font:inherit;font-size:13px;padding:5px 9px;borde
       <label style="font-size:13px;color:var(--muted);display:flex;align-items:center;gap:5px;cursor:pointer;"><input type="checkbox" id="wfOnly"> Workflow only</label>
       <button id="editWf">Edit workflow tags</button>
       <button id="exportWf" style="display:none;">Export list</button>
+      <div style="position:relative;"><button id="metricsBtn">Columns ▾</button><div id="metricsMenu" class="mmenu" style="display:none;"></div></div>
       <select id="pageSize"><option value="10">Top 10</option><option value="20">Top 20</option><option value="30">Top 30</option><option value="50">Top 50</option><option value="all">All pages</option></select>
     </div>
   </div>
@@ -235,7 +243,22 @@ function renderTrend(){
 
 /* Top pages */
 const PM=[{k:"views",l:"Views",f:v=>v},{k:"sessions",l:"Sessions",f:v=>v},{k:"users",l:"Users",f:v=>v},{k:"avgEng",l:"Avg engagement",f:fmtDur},{k:"engRate",l:"Engagement rate",f:fmtPct},{k:"bounce",l:"Bounce rate",f:fmtPct}];
-let cols=new Set(["views","sessions","users"]),sk="views",sd="desc",psize=10,pidx=0,wfo=false,editWf=false;
+let cols=new Set(["views","sessions","users"]),colOrder=PM.map(m=>m.k),sk="views",sd="desc",psize=10,pidx=0,wfo=false,editWf=false;
+function buildMetricsMenu(){
+ const menu=document.getElementById("metricsMenu");
+ menu.innerHTML='<div class="mhint">Tick to show · drag ⠿ to reorder</div>'+colOrder.map(k=>{const mt=PM.find(m=>m.k===k);return `<div class="mrow" draggable="true" data-k="${k}"><span class="drag" aria-hidden="true">⠿</span><label><input type="checkbox" data-k="${k}" ${cols.has(k)?"checked":""}> ${mt.l}</label></div>`;}).join("");
+ menu.querySelectorAll("input").forEach(cb=>cb.addEventListener("change",function(){const k=this.getAttribute("data-k");if(this.checked)cols.add(k);else cols.delete(k);if(cols.size===0)cols.add("views");if(sk!=="page"&&!cols.has(sk))sk=colOrder.find(x=>cols.has(x))||"views";renderPages();}));
+ let dragK=null;
+ menu.querySelectorAll(".mrow").forEach(row=>{
+  row.addEventListener("dragstart",function(e){dragK=this.getAttribute("data-k");e.dataTransfer.effectAllowed="move";this.style.opacity=".4";});
+  row.addEventListener("dragend",function(){this.style.opacity="1";menu.querySelectorAll(".mrow").forEach(r=>r.classList.remove("dragover"));});
+  row.addEventListener("dragover",function(e){e.preventDefault();this.classList.add("dragover");});
+  row.addEventListener("dragleave",function(){this.classList.remove("dragover");});
+  row.addEventListener("drop",function(e){e.preventDefault();const overK=this.getAttribute("data-k");if(!dragK||dragK===overK)return;const from=colOrder.indexOf(dragK),to=colOrder.indexOf(overK);colOrder.splice(from,1);colOrder.splice(to,0,dragK);buildMetricsMenu();renderPages();});
+ });
+}
+document.getElementById("metricsBtn").addEventListener("click",function(e){e.stopPropagation();const m=document.getElementById("metricsMenu");m.style.display=m.style.display==="none"?"block":"none";});
+document.addEventListener("click",function(e){const m=document.getElementById("metricsMenu");if(m&&m.style.display==="block"&&!m.contains(e.target)&&e.target.id!=="metricsBtn")m.style.display="none";});
 let WF=loadWF();
 function loadWF(){try{const s=localStorage.getItem("om_wf");if(s)return new Set(JSON.parse(s));}catch(e){}return new Set(WORKFLOW_BASE);}
 function saveWF(){try{localStorage.setItem("om_wf",JSON.stringify([...WF].sort()));}catch(e){}}
@@ -243,7 +266,7 @@ function pageRows(){return Object.keys(pgCache).map(k=>{const o=pgCache[k];retur
 function renderPages(){
  let data=pageRows();
  if(wfo)data=data.filter(r=>WF.has(r.path));
- const cc=PM.filter(m=>cols.has(m.k));
+ const cc=colOrder.map(k=>PM.find(m=>m.k===k)).filter(m=>cols.has(m.k));
  const ar=k=>sk===k?(sd==="desc"?"▾":"▴"):"";
  const editTh=editWf?'<th style="width:30px">✓WF</th>':'';
  document.querySelector("#pagesTable thead").innerHTML='<tr><th></th>'+editTh+'<th data-k="page">Headline <span class="arr">'+ar("page")+'</span></th>'+cc.map(c=>`<th class="num" data-k="${c.k}">${c.l} <span class="arr">${ar(c.k)}</span></th>`).join("")+'</tr>';
@@ -317,6 +340,7 @@ psel.onchange=function(){const v=this.value;const custom=v==="Custom…";documen
 document.getElementById("applyCustom").onclick=function(){const cs=document.getElementById("cstart").value,ce=document.getElementById("cend").value;if(!cs||!ce)return;let a=parseInt(cs.replace(/-/g,""),10),b=parseInt(ce.replace(/-/g,""),10);if(b<a){const t=a;a=b;b=t;}setRange(a,b);};
 (function initCustom(){const f=function(n){const y=Math.floor(n/10000),m=String(Math.floor(n/100)%100).padStart(2,"0"),d=String(n%100).padStart(2,"0");return y+"-"+m+"-"+d;};document.getElementById("cstart").value=f(addDays(MAXD,-27));document.getElementById("cend").value=f(MAXD);})();
 
+buildMetricsMenu();
 const r0=presetRange("Last 28 days");setRange(r0[0],r0[1]);
 </script>
 </body>
