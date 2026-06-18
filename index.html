@@ -123,7 +123,7 @@ table.pages a{text-decoration:none;}
         </div>
         <div style="display:flex;align-items:center;gap:8px;" class="no-print">
           <span class="chip" id="updChip"><span class="lv"></span> Refreshes daily</span>
-          <button class="btn icon" id="printBtn" title="Print or save as PDF">⎙ Print</button>
+          <div style="position:relative;"><button class="btn icon" id="exportBtn">⬇ Export CSV ▾</button><div id="exportMenu" class="mmenu" style="display:none;"></div></div>
         </div>
       </div>
       <div class="ctrlrow">
@@ -408,8 +408,25 @@ document.getElementById("applyCustom").onclick=function(){const cs=document.getE
 /* channel pills */
 document.querySelectorAll("#chanPills button").forEach(btn=>btn.addEventListener("click",function(){document.querySelectorAll("#chanPills button").forEach(x=>x.classList.remove("active"));this.classList.add("active");chanMode=this.getAttribute("data-c");renderChan();}));
 
-/* print + chip + scrollspy */
-document.getElementById("printBtn").onclick=()=>window.print();
+/* CSV export + chip + scrollspy */
+function csvCell(v){v=String(v==null?"":v);return /[",\n\r]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v;}
+function downloadCSV(name,m){const csv="﻿"+m.map(r=>r.map(csvCell).join(",")).join("\r\n");const b=new Blob([csv],{type:"text/csv;charset=utf-8;"});const a=document.createElement("a");a.href=URL.createObjectURL(b);a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},100);}
+function rngTag(){return RANGE[0]+"-"+RANGE[1];}
+function chanRows(mode,a,b){let rows;if(mode==="ai"){const m=sumDim(DAILY.sm,a,b),agg={};Object.keys(m).forEach(sm=>{const src=sm.split(" / ")[0];if(isAI(src)){const f=friendlyAI(src);agg[f]=(agg[f]||0)+m[sm];}});rows=Object.keys(agg).map(k=>[k,agg[k]]).sort((x,y)=>y[1]-x[1]);}else if(mode==="sourcemedium"){const m=sumDim(DAILY.sm,a,b);rows=Object.keys(m).map(k=>[k,m[k]]).sort((x,y)=>y[1]-x[1]);}else{const m=sumDim(DAILY.chan,a,b);rows=Object.keys(m).map(k=>[k,m[k]]).sort((x,y)=>y[1]-x[1]);}return rows;}
+function exportSection(key){
+ const [a,b]=RANGE;
+ if(key==="kpi"){const cur=totals(pgCache),len=daysBetween(a,b),pb=addDays(a,-1),pa=addDays(pb,-(len-1)),prev=totals(aggPages(pa,pb)),pct=(x,y)=>y?(((x-y)/y*100>=0?"+":"")+Math.round((x-y)/y*100)+"%"):"";
+  downloadCSV("kpis_"+rngTag()+".csv",[["Metric","Current","Previous","Change"],["Page views",cur.views,prev.views,pct(cur.views,prev.views)],["Sessions",cur.sessions,prev.sessions,pct(cur.sessions,prev.sessions)],["Active users (approx)",cur.users,prev.users,pct(cur.users,prev.users)],["Engagement rate",(cur.engRate*100).toFixed(1)+"%",(prev.engRate*100).toFixed(1)+"%",""],["Avg engagement (s)",Math.round(cur.avgEng),Math.round(prev.avgEng),""]]);return;}
+ if(key==="trend"){const span=daysBetween(a,b),byd={};for(const r of DAILY.rows){if(r[0]<a||r[0]>b)continue;byd[r[0]]=(byd[r[0]]||0)+r[2];}let m=[["Date","Page views"]];if(span>62){const bym={};Object.keys(byd).forEach(d=>{const ym=Math.floor(d/100);bym[ym]=(bym[ym]||0)+byd[d];});Object.keys(bym).map(Number).sort((x,y)=>x-y).forEach(k=>m.push([monLabel(k),bym[k]]));}else{let d=a;while(d<=b){m.push([fmtFull(d),byd[d]||0]);d=addDays(d,1);}}downloadCSV("daily_trend_"+rngTag()+".csv",m);return;}
+ if(key==="pages"){const rows=pageRows(),dir=sd==="desc"?-1:1;rows.sort((x,y)=>{if(sk==="page"){const p=prettify(x.path).toLowerCase(),q=prettify(y.path).toLowerCase();return p<q?dir:p>q?-dir:0;}return (x[sk]-y[sk])*dir;});const m=[["Rank","Headline","Path","Workflow","Views","Sessions","Users","Avg engagement (s)","Engagement rate","Bounce rate"]];rows.forEach((r,i)=>m.push([i+1,prettify(r.path),r.path,WF.has(r.path)?"Yes":"No",r.views,r.sessions,r.users,Math.round(r.avgEng),(r.engRate*100).toFixed(1)+"%",(r.bounce*100).toFixed(1)+"%"]));downloadCSV("top_pages_"+rngTag()+".csv",m);return;}
+ if(key==="channels"){const rows=chanRows(chanMode,a,b),lab=chanMode==="ai"?"AI assistant":chanMode==="sourcemedium"?"Source / medium":"Channel";downloadCSV("channels_"+chanMode+"_"+rngTag()+".csv",[[lab,"Sessions"]].concat(rows));return;}
+ if(key==="readers"){const m=sumDim(DAILY.nvr,a,b),ent=sumVal(DAILY.ent,a,b);downloadCSV("readers_"+rngTag()+".csv",[["Segment","Sessions"],["New",m["new"]||0],["Returning",m["returning"]||0],["Blog-entry sessions",ent]]);return;}
+ if(key==="movers"){const m=[["Direction","Headline","Path","Prev views","Cur views","Delta"]];FIXED.risers.forEach(r=>m.push(["Rising",prettify(r[0]),r[0],r[1],r[2],r[2]-r[1]]));FIXED.fallers.forEach(r=>m.push(["Falling",prettify(r[0]),r[0],r[1],r[2],r[2]-r[1]]));downloadCSV("movers_last28days.csv",m);return;}
+ if(key==="search"){const m=[["Query","Clicks","Impressions","CTR","Position"]];FIXED.search.forEach(r=>m.push([r[0],r[1],r[2],(r[3]*100).toFixed(1)+"%",r[4]]));downloadCSV("search_queries_last28days.csv",m);return;}
+ if(key==="journey"){const m=[["From","To","Clicks"]];FIXED.journey.forEach(g=>g.dests.forEach(d=>m.push([prettify(g.from),prettify(d[0]),d[1]])));downloadCSV("journey_last28days.csv",m);return;}
+}
+const EXPORTS=[["kpi","KPI summary"],["trend","Daily trend"],["pages","Top pages (all)"],["channels","Channels (current view)"],["readers","Readers"],["movers","Top movers"],["search","Search queries"],["journey","User journey"]];
+(function(){const em=document.getElementById("exportMenu");em.innerHTML='<div class="mhint">Each section downloads its own CSV</div>'+EXPORTS.map(e=>`<div class="mrow"><label data-k="${e[0]}">${e[1]}</label></div>`).join("");em.querySelectorAll("label[data-k]").forEach(l=>l.onclick=function(){exportSection(this.getAttribute("data-k"));em.style.display="none";});document.getElementById("exportBtn").addEventListener("click",function(e){e.stopPropagation();em.style.display=em.style.display==="none"?"block":"none";});document.addEventListener("click",function(e){if(em.style.display==="block"&&!em.contains(e.target)&&e.target.id!=="exportBtn")em.style.display="none";});})();
 document.getElementById("updChip").innerHTML='<span class="lv"></span> Data through '+fmtFull(MAXD)+' · refreshes daily';
 (function spy(){const links={};document.querySelectorAll(".sidenav a").forEach(a=>links[a.getAttribute("data-s")]=a);const obs=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){Object.values(links).forEach(l=>l.classList.remove("active"));const l=links[e.target.id];if(l)l.classList.add("active");}});},{rootMargin:"-45% 0px -50% 0px"});["s-kpi","s-trend","s-pages","s-chan","s-readers","s-movers","s-search","s-journey","s-analysis"].forEach(id=>{const el=document.getElementById(id);if(el)obs.observe(el);});})();
 
