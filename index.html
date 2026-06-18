@@ -6,17 +6,42 @@
 <title>OpenMinds Blog Report 2026</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.0/dist/chart.umd.js"></script>
 <style>
-:root{--pink:#E41672;--cyan:#3BB3E7;--amber:#FAB018;--green:#87C540;--ink:#1F1F20;--muted:#5F5E5A;--line:rgba(0,0,0,0.10);}
+:root{--pink:#E41672;--cyan:#3BB3E7;--amber:#FAB018;--green:#87C540;--purple:#7F77DD;--ink:#1F1F20;--muted:#5F5E5A;--line:rgba(0,0,0,0.10);--bg:#F7F6F3;}
 *{box-sizing:border-box;}
-body{margin:0 auto;padding:24px;max-width:1000px;background:#fff;color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;line-height:1.5;}
-.head{display:flex;align-items:baseline;justify-content:space-between;flex-wrap:wrap;gap:8px;border-bottom:2px solid var(--pink);padding-bottom:10px;margin-bottom:6px;}
-.head h1{font-size:20px;font-weight:600;margin:0;}
-.head .sub{font-size:13px;color:var(--muted);}
-.controls{display:flex;align-items:center;gap:8px;margin:14px 0 4px;flex-wrap:wrap;}
-.snapnote{font-size:12px;color:var(--muted);margin:6px 0 22px;}
-.sec{font-size:15px;font-weight:600;margin:0 0 8px;}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;line-height:1.5;}
+a{color:#185FA5;}
+.layout{display:flex;gap:22px;align-items:flex-start;max-width:1200px;margin:0 auto;padding:18px;}
+.sidebar{position:sticky;top:14px;width:198px;flex:none;}
+.brand{display:flex;align-items:center;gap:8px;font-weight:600;font-size:15px;margin:4px 8px 14px;}
+.brand .dotb{width:12px;height:12px;border-radius:3px;background:var(--pink);}
+.sidenav{display:flex;flex-direction:column;gap:2px;}
+.sidenav a{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);text-decoration:none;padding:7px 10px;border-radius:8px;border-left:3px solid transparent;}
+.sidenav a:hover{background:#EEEDEA;color:var(--ink);}
+.sidenav a.active{background:#fff;color:var(--ink);font-weight:500;border-left-color:var(--pink);box-shadow:0 1px 2px rgba(0,0,0,.04);}
+.sidenav .nd{width:8px;height:8px;border-radius:2px;flex:none;}
+.content{flex:1;min-width:0;}
+.topbar{position:sticky;top:0;z-index:40;background:rgba(247,246,243,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);padding:10px 0 12px;margin-bottom:18px;}
+.topbar h1{font-size:19px;font-weight:600;margin:0 0 2px;}
+.topbar .sub{font-size:12px;color:var(--muted);}
+.toprow{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;}
+.chip{display:inline-flex;align-items:center;gap:6px;font-size:11px;color:#0F6E56;background:#E1F5EE;border:1px solid #9FE1CB;border-radius:20px;padding:3px 10px;}
+.chip .lv{width:7px;height:7px;border-radius:50%;background:#1D9E75;}
+.ctrlrow{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:10px;}
+.seg{display:inline-flex;background:#ECEAE4;border-radius:10px;padding:3px;gap:2px;flex-wrap:wrap;}
+.seg button{border:none;background:transparent;border-radius:8px;padding:6px 11px;font:inherit;font-size:13px;color:var(--muted);cursor:pointer;}
+.seg button:hover{color:var(--ink);}
+.seg button.active{background:#fff;color:var(--pink);font-weight:500;box-shadow:0 1px 2px rgba(0,0,0,.08);}
+.prange{font-size:13px;color:var(--muted);}
+select,input[type=date]{font:inherit;font-size:13px;padding:6px 10px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--ink);cursor:pointer;}
+.btn{font:inherit;font-size:13px;padding:6px 11px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--ink);cursor:pointer;}
+.btn:hover{background:#F1EFE8;}
+.btn.primary{background:var(--pink);color:#fff;border-color:var(--pink);}
+.btn.primary:hover{opacity:.92;background:var(--pink);}
+.btn.active{background:var(--pink);color:#fff;border-color:var(--pink);}
+.btn.icon{display:inline-flex;align-items:center;gap:6px;}
+.card{background:#fff;border:1px solid var(--line);border-left:3px solid var(--accent,var(--pink));border-radius:14px;padding:16px 20px;margin-bottom:18px;scroll-margin-top:120px;}
+.sec{font-size:15px;font-weight:600;margin:0 0 10px;}
 .pin{font-size:11px;font-weight:400;color:var(--muted);}
-.block{margin-bottom:30px;}
 .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;}
 .kpi{border-radius:10px;padding:14px;position:relative;}
 .kpi .lab{font-size:12px;}.kpi .val{font-size:24px;font-weight:600;margin-top:2px;}.kpi .delta{font-size:12px;margin-top:2px;}
@@ -27,22 +52,24 @@ body{margin:0 auto;padding:24px;max-width:1000px;background:#fff;color:var(--ink
 .chartwrap{position:relative;width:100%;}
 .legend{display:flex;flex-wrap:wrap;gap:14px;margin-bottom:8px;font-size:12px;color:var(--muted);}
 .legend span{display:flex;align-items:center;gap:5px;}.dot{width:10px;height:10px;border-radius:2px;display:inline-block;}
+.thead-tools{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:8px;}
+.tools{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.tablewrap{overflow-x:auto;}
 table.pages{width:100%;border-collapse:collapse;font-size:13px;}
-table.pages th{text-align:left;color:var(--muted);font-weight:500;border-bottom:1px solid var(--line);padding:6px 8px;cursor:pointer;user-select:none;}
+table.pages th{text-align:left;color:var(--muted);font-weight:500;border-bottom:1px solid var(--line);padding:6px 8px;cursor:pointer;user-select:none;background:#fff;position:sticky;top:56px;z-index:2;}
 table.pages td{padding:7px 8px;border-bottom:1px solid var(--line);vertical-align:top;}
 table.pages td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap;}
-table.pages a{color:#185FA5;text-decoration:none;}
+table.pages a{text-decoration:none;}
 .rank{color:var(--muted);width:22px;}.arr{font-size:10px;}
 .wf{display:inline-block;font-size:10px;font-weight:600;color:#0C447C;background:#E6F1FB;border:1px solid #B5D4F4;border-radius:20px;padding:1px 7px;margin-left:6px;vertical-align:middle;white-space:nowrap;}
-select,button,input[type=date]{font:inherit;font-size:13px;padding:5px 9px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--ink);cursor:pointer;}
-.mmenu{position:absolute;right:0;top:32px;background:#fff;border:1px solid var(--line);border-radius:8px;box-shadow:0 4px 14px rgba(0,0,0,.12);padding:6px;z-index:20;min-width:185px;}
+.mmenu{position:absolute;right:0;top:34px;background:#fff;border:1px solid var(--line);border-radius:8px;box-shadow:0 4px 14px rgba(0,0,0,.12);padding:6px;z-index:25;min-width:190px;}
 .mmenu .mhint{font-size:11px;color:var(--muted);padding:4px 6px 6px;}
 .mmenu .mrow{display:flex;align-items:center;gap:2px;border-radius:6px;}
 .mmenu .mrow.dragover{background:#FCE8F1;}
 .mmenu .drag{cursor:grab;color:#B4B2A9;font-size:13px;padding:0 4px;user-select:none;}
 .mmenu label{display:flex;align-items:center;gap:8px;font-size:13px;padding:5px 6px;border-radius:6px;cursor:pointer;white-space:nowrap;flex:1;}
 .mmenu label:hover{background:#F1EFE8;}
-.btnp{background:var(--pink);color:#fff;border-color:var(--pink);}
+.pager{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:8px;font-size:12px;color:var(--muted);}
 .analysis{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;}
 .acard{border-radius:10px;padding:14px 16px;border:1px solid var(--line);}.acard h3{font-size:13px;font-weight:600;margin:0 0 8px;}
 .acard ul{margin:0;padding-left:18px;font-size:13px;}.acard li{margin-bottom:7px;}
@@ -51,78 +78,131 @@ select,button,input[type=date]{font:inherit;font-size:13px;padding:5px 9px;borde
 .an{background:#EBF7FD;border-color:#B1E1F5;}.an h3{color:#18485C;}
 .jcard{padding:10px 14px;margin-bottom:10px;border:1px solid var(--line);border-radius:10px;}
 .jhead{display:flex;align-items:center;gap:8px;flex-wrap:wrap;cursor:pointer;}
-.foot{font-size:11px;color:var(--muted);border-top:1px solid var(--line);padding-top:12px;margin-top:10px;}
+.foot{font-size:11px;color:var(--muted);padding-top:6px;margin-top:6px;}
+@media(max-width:860px){
+ .layout{flex-direction:column;padding:12px;}
+ .sidebar{position:sticky;top:0;width:100%;z-index:45;background:var(--bg);padding:6px 0;}
+ .brand{display:none;}
+ .sidenav{flex-direction:row;overflow-x:auto;gap:6px;padding-bottom:4px;}
+ .sidenav a{border-left:none;border-bottom:3px solid transparent;white-space:nowrap;padding:6px 10px;}
+ .sidenav a.active{border-left:none;border-bottom-color:var(--pink);}
+ table.pages th{top:0;}
+}
+@media print{
+ body{background:#fff;}
+ .sidebar,.topbar .ctrlrow,.no-print,.tools{display:none!important;}
+ .topbar{position:static;}
+ .card{break-inside:avoid;border-left-width:3px;}
+ .layout{display:block;max-width:none;}
+}
 </style>
 </head>
 <body>
-<div class="head">
-  <h1>Blog performance — /blog</h1>
-  <div class="sub">OpenMinds Group (GA4 · property 277421164)</div>
-</div>
-<div class="controls">
-  <label for="period" style="font-size:13px;color:var(--muted);">Period</label>
-  <select id="period"></select>
-  <span id="customWrap" style="display:none;align-items:center;gap:6px;">
-    <input type="date" id="cstart"> <span style="color:var(--muted)">to</span> <input type="date" id="cend"> <button id="applyCustom" class="btnp">Apply</button>
-  </span>
-  <span id="periodRange" style="font-size:13px;color:var(--muted);"></span>
-</div>
-<p class="snapnote" id="snapnote">Static snapshot from Google Analytics 4 &amp; Google Search Console. Pick any period — figures recompute in your browser from baked daily data. KPI changes compare with the preceding period of equal length. Active users is approximate for multi-day ranges. Search, Journey, Movers and Analysis are pinned to the last 28 days. UK English.</p>
+<div class="layout">
+  <aside class="sidebar">
+    <div class="brand"><span class="dotb"></span> Blog analytics</div>
+    <nav class="sidenav" id="sidenav">
+      <a href="#s-kpi" data-s="s-kpi"><span class="nd" style="background:var(--pink)"></span> Overview</a>
+      <a href="#s-trend" data-s="s-trend"><span class="nd" style="background:var(--cyan)"></span> Trend</a>
+      <a href="#s-pages" data-s="s-pages"><span class="nd" style="background:var(--green)"></span> Top pages</a>
+      <a href="#s-chan" data-s="s-chan"><span class="nd" style="background:var(--amber)"></span> Channels</a>
+      <a href="#s-readers" data-s="s-readers"><span class="nd" style="background:var(--purple)"></span> Readers</a>
+      <a href="#s-movers" data-s="s-movers"><span class="nd" style="background:var(--green)"></span> Movers</a>
+      <a href="#s-search" data-s="s-search"><span class="nd" style="background:var(--cyan)"></span> Search</a>
+      <a href="#s-journey" data-s="s-journey"><span class="nd" style="background:var(--pink)"></span> Journey</a>
+      <a href="#s-analysis" data-s="s-analysis"><span class="nd" style="background:var(--amber)"></span> Analysis</a>
+    </nav>
+  </aside>
 
-<div class="block"><div class="kpis" id="kpis"></div></div>
-
-<div class="block">
-  <div class="sec" id="trendTitle">Daily page views</div>
-  <div class="chartwrap" style="height:230px;"><canvas id="trendChart"></canvas></div>
-  <div id="trendPeak" style="font-size:12px;color:#966A0E;margin-top:6px;"></div>
-</div>
-
-<div class="block">
-  <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:8px;">
-    <div class="sec" style="margin:0;">Top blog pages</div>
-    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-      <label style="font-size:13px;color:var(--muted);display:flex;align-items:center;gap:5px;cursor:pointer;"><input type="checkbox" id="wfOnly"> Workflow only</label>
-      <button id="editWf">Edit workflow tags</button>
-      <button id="exportWf" style="display:none;">Export list</button>
-      <div style="position:relative;"><button id="metricsBtn">Columns ▾</button><div id="metricsMenu" class="mmenu" style="display:none;"></div></div>
-      <select id="pageSize"><option value="10">Top 10</option><option value="20">Top 20</option><option value="30">Top 30</option><option value="50">Top 50</option><option value="all">All pages</option></select>
+  <div class="content">
+    <div class="topbar">
+      <div class="toprow">
+        <div>
+          <h1>Blog performance — /blog</h1>
+          <div class="sub">OpenMinds Group (GA4 · property 277421164)</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;" class="no-print">
+          <span class="chip" id="updChip"><span class="lv"></span> Refreshes daily</span>
+          <button class="btn icon" id="printBtn" title="Print or save as PDF">⎙ Print</button>
+        </div>
+      </div>
+      <div class="ctrlrow">
+        <div class="seg" id="periodPills">
+          <button data-p="Last 28 days" class="active">Last 28 days</button>
+          <button data-p="This month">This month</button>
+          <button data-p="Last month">Last month</button>
+          <button data-p="Year to date">Year to date</button>
+          <button data-p="Custom…">Custom…</button>
+        </div>
+        <span id="customWrap" style="display:none;align-items:center;gap:6px;">
+          <input type="date" id="cstart"> <span style="color:var(--muted)">to</span> <input type="date" id="cend"> <button id="applyCustom" class="btn primary">Apply</button>
+        </span>
+        <span class="prange" id="periodRange"></span>
+      </div>
     </div>
+
+    <p class="foot" id="snapnote" style="margin-top:-6px;margin-bottom:16px;">Computed in your browser from baked daily data — pick any period above. KPI changes compare with the preceding period of equal length. Active users is approximate for multi-day ranges. Search, Journey, Movers &amp; Analysis are pinned to the last 28 days. UK English.</p>
+
+    <div class="card" id="s-kpi" style="--accent:var(--pink)"><div class="kpis" id="kpis"></div></div>
+
+    <div class="card" id="s-trend" style="--accent:var(--cyan)">
+      <div class="sec" id="trendTitle">Daily page views</div>
+      <div class="chartwrap" style="height:230px;"><canvas id="trendChart"></canvas></div>
+      <div id="trendPeak" style="font-size:12px;color:#966A0E;margin-top:6px;"></div>
+    </div>
+
+    <div class="card" id="s-pages" style="--accent:var(--green)">
+      <div class="thead-tools">
+        <div class="sec" style="margin:0;">Top blog pages</div>
+        <div class="tools">
+          <label style="font-size:13px;color:var(--muted);display:flex;align-items:center;gap:5px;cursor:pointer;"><input type="checkbox" id="wfOnly"> Workflow only</label>
+          <button class="btn" id="editWf">Edit workflow tags</button>
+          <button class="btn" id="exportWf" style="display:none;">Export list</button>
+          <div style="position:relative;"><button class="btn" id="metricsBtn">Columns ▾</button><div id="metricsMenu" class="mmenu" style="display:none;"></div></div>
+          <select id="pageSize"><option value="10">Top 10</option><option value="20">Top 20</option><option value="30">Top 30</option><option value="50">Top 50</option><option value="all">All pages</option></select>
+        </div>
+      </div>
+      <div class="tablewrap"><table class="pages" id="pagesTable"><thead></thead><tbody></tbody></table></div>
+      <textarea id="wfExport" style="display:none;width:100%;height:90px;margin-top:8px;font-size:11px;font-family:monospace;" readonly></textarea>
+      <div class="pager">
+        <span>Click a header to sort. <span class="wf">✓ Workflow</span> = produced via the content workflow.</span>
+        <span style="display:flex;align-items:center;gap:8px;"><button class="btn" id="pagePrev">‹ Prev</button><span id="pageInfo"></span><button class="btn" id="pageNext">Next ›</button></span>
+      </div>
+    </div>
+
+    <div class="card" id="s-chan" style="--accent:var(--amber)">
+      <div class="thead-tools">
+        <div class="sec" id="chanTitle" style="margin:0;">Sessions by channel</div>
+        <div class="seg" id="chanPills">
+          <button data-c="channel" class="active">Channel group</button>
+          <button data-c="sourcemedium">Source / medium</button>
+          <button data-c="ai">AI assistants</button>
+        </div>
+      </div>
+      <div class="legend" id="chanLegend"></div>
+      <div class="chartwrap" id="chanWrap" style="height:200px;"><canvas id="channelChart"></canvas></div>
+    </div>
+
+    <div class="card" id="s-readers" style="--accent:var(--purple)"><div class="sec">Readers — new vs returning</div><div class="kpis" id="readersBody"></div></div>
+
+    <div class="card" id="s-movers" style="--accent:var(--green)"><div class="sec">Top movers <span class="pin">· last 28 days</span></div><div id="moversBody" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;"></div></div>
+
+    <div class="card" id="s-search" style="--accent:var(--cyan)">
+      <div class="sec">Search queries — Google Search Console <span class="pin">· last 28 days</span></div>
+      <div class="tablewrap"><table class="pages" id="searchTable"><thead></thead><tbody></tbody></table></div>
+    </div>
+
+    <div class="card" id="s-journey" style="--accent:var(--pink)">
+      <div class="sec">User journey — blog page to page <span class="pin">· last 28 days</span></div>
+      <div style="font-size:12px;color:var(--muted);margin:-2px 0 8px;">Internal clicks from one blog page to another. Click a FROM header to expand.</div>
+      <div id="journeyBody"></div>
+    </div>
+
+    <div class="card" id="s-analysis" style="--accent:var(--amber)"><div class="sec">Analysis <span class="pin">· last 28 days</span></div><div class="analysis" id="analysis"></div></div>
+
+    <div class="foot">Prepared with Cowork. Source: Google Analytics 4 &amp; Google Search Console. Engagement rate = engaged sessions ÷ sessions. Avg engagement = engagement time ÷ sessions. Search Console data lags ~2 days.</div>
   </div>
-  <table class="pages" id="pagesTable"><thead></thead><tbody></tbody></table>
-  <textarea id="wfExport" style="display:none;width:100%;height:90px;margin-top:8px;font-size:11px;font-family:monospace;" readonly></textarea>
-  <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:8px;font-size:12px;color:var(--muted);">
-    <span>Click a header to sort. <span class="wf">✓ Workflow</span> = produced via the content workflow.</span>
-    <span style="display:flex;align-items:center;gap:8px;"><button id="pagePrev">‹ Prev</button><span id="pageInfo"></span><button id="pageNext">Next ›</button></span>
-  </div>
 </div>
-
-<div class="block">
-  <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:8px;">
-    <div class="sec" id="chanTitle" style="margin:0;">Sessions by channel</div>
-    <select id="chanMode"><option value="channel">Channel group</option><option value="sourcemedium">Source / medium</option><option value="ai">AI assistants only</option></select>
-  </div>
-  <div class="legend" id="chanLegend"></div>
-  <div class="chartwrap" id="chanWrap" style="height:200px;"><canvas id="channelChart"></canvas></div>
-</div>
-
-<div class="block"><div class="sec">Readers — new vs returning</div><div class="kpis" id="readersBody"></div></div>
-
-<div class="block"><div class="sec">Top movers <span class="pin">· last 28 days</span></div><div id="moversBody" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;"></div></div>
-
-<div class="block">
-  <div class="sec">Search queries — Google Search Console <span class="pin">· last 28 days</span></div>
-  <table class="pages" id="searchTable"><thead></thead><tbody></tbody></table>
-</div>
-
-<div class="block">
-  <div class="sec">User journey — blog page to page <span class="pin">· last 28 days</span></div>
-  <div style="font-size:12px;color:var(--muted);margin:-2px 0 8px;">Internal clicks from one blog page to another. Click a FROM header to expand.</div>
-  <div id="journeyBody"></div>
-</div>
-
-<div class="block"><div class="sec">Analysis <span class="pin">· last 28 days</span></div><div class="analysis" id="analysis"></div></div>
-
-<div class="foot">Prepared with Cowork. Source: Google Analytics 4 &amp; Google Search Console. Engagement rate = engaged sessions ÷ sessions. Avg engagement = engagement time ÷ sessions. Search Console data lags ~2 days.</div>
 
 <script>
 const PINK="#E41672",CYAN="#3BB3E7",AMBER="#FAB018",GREEN="#87C540",PINKL="#F4A2C7";
@@ -174,7 +254,6 @@ const FIXED={
 };
 /*__DATA_END__*/
 
-/* date helpers (dateInt = YYYYMMDD) */
 const MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 function intToDate(n){return new Date(Math.floor(n/10000),Math.floor(n/100)%100-1,n%100);}
 function dateToInt(d){return d.getFullYear()*10000+(d.getMonth()+1)*100+d.getDate();}
@@ -194,42 +273,34 @@ function presetRange(name){
  if(name==="Year to date")return [dateToInt(new Date(ed.getFullYear(),0,1)),MAXD];
  return [addDays(MAXD,-27),MAXD];
 }
-
 function aggPages(a,b){const pg={};for(const r of DAILY.rows){if(r[0]<a||r[0]>b)continue;const k=r[1];if(!pg[k])pg[k]={v:0,s:0,es:0,dur:0,u:0};pg[k].v+=r[2];pg[k].s+=r[3];pg[k].es+=r[4];pg[k].dur+=r[5];pg[k].u+=r[6];}return pg;}
 function totals(pg){let v=0,s=0,es=0,dur=0,u=0;for(const k in pg){const o=pg[k];v+=o.v;s+=o.s;es+=o.es;dur+=o.dur;u+=o.u;}return {views:v,sessions:s,engaged:es,dur:dur,users:u,engRate:s?es/s:0,avgEng:s?dur/s:0};}
 function sumDim(arr,a,b){const m={};for(const r of arr){if(r[0]<a||r[0]>b)continue;m[r[1]]=(m[r[1]]||0)+r[2];}return m;}
 function sumVal(arr,a,b){let t=0;for(const r of arr){if(r[0]<a||r[0]>b)continue;t+=r[1];}return t;}
 
-let RANGE=[0,0], pgCache={};
+let RANGE=[0,0], pgCache={}, chanMode="channel";
 const num=v=>Math.round(v);
 function fmtDur(s){s=Math.round(s);const m=Math.floor(s/60),ss=s%60;return m+"m "+String(ss).padStart(2,"0")+"s";}
 function fmtPct(v){return (v*100).toFixed(1)+"%";}
 
-/* KPIs */
 function renderKpis(){
- const cur=totals(pgCache);
- const [a,b]=RANGE,len=daysBetween(a,b),pb=addDays(a,-1),pa=addDays(pb,-(len-1));
+ const cur=totals(pgCache),[a,b]=RANGE,len=daysBetween(a,b),pb=addDays(a,-1),pa=addDays(pb,-(len-1));
  const prev=totals(aggPages(pa,pb));
- const fI=v=>num(v),fP=v=>(v*100).toFixed(1)+"%",fS=v=>fmtDur(v);
- const pc=(x,y)=>{if(!y)return null;return Math.round((x-y)/y*100);};
+ const fI=v=>num(v),fP=v=>(v*100).toFixed(1)+"%",fS=v=>fmtDur(v),pc=(x,y)=>{if(!y)return null;return Math.round((x-y)/y*100);};
  const cards=[
   {lab:"Page views",bg:"#FCE8F1",lc:"#890D44",vc:"#5B092E",cur:cur.views,prev:prev.views,fmt:fI,desc:"Total times blog pages were loaded, including repeat views."},
   {lab:"Sessions",bg:"#EBF7FD",lc:"#18485C",vc:"#0C242E",cur:cur.sessions,prev:prev.sessions,fmt:fI,desc:"Distinct visits to the blog."},
-  {lab:"Active users",bg:"#F3F9EC",lc:"#364F1A",vc:"#1B270D",cur:cur.users,prev:prev.users,fmt:fI,desc:"Unique people. Approximate for multi-day ranges (sums daily uniques, so returning visitors may be counted more than once)."},
+  {lab:"Active users",bg:"#F3F9EC",lc:"#364F1A",vc:"#1B270D",cur:cur.users,prev:prev.users,fmt:fI,desc:"Unique people. Approximate for multi-day ranges (sums daily uniques)."},
   {lab:"Engagement rate",bg:"#FFF7E8",lc:"#966A0E",vc:"#64460A",cur:cur.engRate,prev:prev.engRate,fmt:fP,desc:"Engaged sessions (10s+, a key event, or 2+ pages) divided by sessions."},
   {lab:"Avg engagement",bg:"#EDEDEE",lc:"#4E4D50",vc:"#1F1F20",cur:cur.avgEng,prev:prev.avgEng,fmt:fS,desc:"Average engagement time per session."}
  ];
- document.getElementById("kpis").innerHTML=cards.map(c=>{
-  const d=pc(c.cur,c.prev),pv=c.fmt(c.prev),good=c.cur>=c.prev;
-  const delta=d===null?("prev "+pv):((d>=0?"▲ ":"▼ ")+Math.abs(d)+"% · prev "+pv);
-  return `<div class="kpi" style="background:${c.bg}"><i class="info" style="color:${c.lc}" title="${c.desc}">i</i><span class="tip">${c.desc}</span><div class="lab" style="color:${c.lc}">${c.lab}</div><div class="val" style="color:${c.vc}">${c.fmt(c.cur)}</div><div class="delta" style="color:${good?'#517626':'#A32D2D'}">${delta}</div></div>`;
- }).join("");
+ document.getElementById("kpis").innerHTML=cards.map(c=>{const d=pc(c.cur,c.prev),pv=c.fmt(c.prev),good=c.cur>=c.prev;const delta=d===null?("prev "+pv):((d>=0?"▲ ":"▼ ")+Math.abs(d)+"% · prev "+pv);return `<div class="kpi" style="background:${c.bg}"><i class="info" style="color:${c.lc}" title="${c.desc}">i</i><span class="tip">${c.desc}</span><div class="lab" style="color:${c.lc}">${c.lab}</div><div class="val" style="color:${c.vc}">${c.fmt(c.cur)}</div><div class="delta" style="color:${good?'#517626':'#A32D2D'}">${delta}</div></div>`;}).join("");
 }
 
 let trendC;
 function renderTrend(){
- const [a,b]=RANGE,span=daysBetween(a,b);
- const byd={};for(const r of DAILY.rows){if(r[0]<a||r[0]>b)continue;byd[r[0]]=(byd[r[0]]||0)+r[2];}
+ const [a,b]=RANGE,span=daysBetween(a,b),byd={};
+ for(const r of DAILY.rows){if(r[0]<a||r[0]>b)continue;byd[r[0]]=(byd[r[0]]||0)+r[2];}
  let labels=[],values=[],gran;
  if(span>62){gran="Monthly page views";const bym={};Object.keys(byd).forEach(d=>{const ym=Math.floor(d/100);bym[ym]=(bym[ym]||0)+byd[d];});Object.keys(bym).map(Number).sort((x,y)=>x-y).forEach(k=>{labels.push(monLabel(k));values.push(bym[k]);});}
  else{gran="Daily page views";let d=a;while(d<=b){labels.push(fmtDay(d));values.push(byd[d]||0);d=addDays(d,1);}}
@@ -241,9 +312,11 @@ function renderTrend(){
  trendC=new Chart(document.getElementById("trendChart"),{type:"line",data:{labels,datasets:[{label:"Page views",data:values,borderColor:PINK,backgroundColor:"rgba(228,22,114,0.12)",fill:true,tension:0.3,borderWidth:2,pointRadius:values.map((v,i)=>i===pk?5:(values.length>60?0:2)),pointBackgroundColor:values.map((v,i)=>i===pk?AMBER:PINK)}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{precision:0}},x:{ticks:{autoSkip:true,maxTicksLimit:14}}}}});
 }
 
-/* Top pages */
 const PM=[{k:"views",l:"Views",f:v=>v},{k:"sessions",l:"Sessions",f:v=>v},{k:"users",l:"Users",f:v=>v},{k:"avgEng",l:"Avg engagement",f:fmtDur},{k:"engRate",l:"Engagement rate",f:fmtPct},{k:"bounce",l:"Bounce rate",f:fmtPct}];
 let cols=new Set(["views","sessions","users"]),colOrder=PM.map(m=>m.k),sk="views",sd="desc",psize=10,pidx=0,wfo=false,editWf=false;
+let WF=loadWF();
+function loadWF(){try{const s=localStorage.getItem("om_wf");if(s)return new Set(JSON.parse(s));}catch(e){}return new Set(WORKFLOW_BASE);}
+function saveWF(){try{localStorage.setItem("om_wf",JSON.stringify([...WF].sort()));}catch(e){}}
 function buildMetricsMenu(){
  const menu=document.getElementById("metricsMenu");
  menu.innerHTML='<div class="mhint">Tick to show · drag ⠿ to reorder</div>'+colOrder.map(k=>{const mt=PM.find(m=>m.k===k);return `<div class="mrow" draggable="true" data-k="${k}"><span class="drag" aria-hidden="true">⠿</span><label><input type="checkbox" data-k="${k}" ${cols.has(k)?"checked":""}> ${mt.l}</label></div>`;}).join("");
@@ -259,9 +332,6 @@ function buildMetricsMenu(){
 }
 document.getElementById("metricsBtn").addEventListener("click",function(e){e.stopPropagation();const m=document.getElementById("metricsMenu");m.style.display=m.style.display==="none"?"block":"none";});
 document.addEventListener("click",function(e){const m=document.getElementById("metricsMenu");if(m&&m.style.display==="block"&&!m.contains(e.target)&&e.target.id!=="metricsBtn")m.style.display="none";});
-let WF=loadWF();
-function loadWF(){try{const s=localStorage.getItem("om_wf");if(s)return new Set(JSON.parse(s));}catch(e){}return new Set(WORKFLOW_BASE);}
-function saveWF(){try{localStorage.setItem("om_wf",JSON.stringify([...WF].sort()));}catch(e){}}
 function pageRows(){return Object.keys(pgCache).map(k=>{const o=pgCache[k];return {path:DAILY.pages[k],views:o.v,sessions:o.s,users:o.u,avgEng:o.s?o.dur/o.s:0,engRate:o.s?o.es/o.s:0,bounce:o.s?1-o.es/o.s:0};});}
 function renderPages(){
  let data=pageRows();
@@ -274,11 +344,7 @@ function renderPages(){
  data.sort((a,b)=>{if(sk==="page"){const x=prettify(a.path).toLowerCase(),y=prettify(b.path).toLowerCase();return x<y?dir:x>y?-dir:0;}return (a[sk]-b[sk])*dir;});
  const tot=data.length,size=psize==="all"?tot:psize,np=Math.max(1,Math.ceil(tot/size));if(pidx>=np)pidx=np-1;if(pidx<0)pidx=0;
  const st=pidx*size,sl=data.slice(st,st+size);
- document.querySelector("#pagesTable tbody").innerHTML=sl.map((r,i)=>{
-  const h1=prettify(r.path),u="https://www.openmindsresources.com"+r.path;
-  const box=editWf?`<td><input type="checkbox" class="wfbox" data-p="${r.path}" ${WF.has(r.path)?"checked":""}></td>`:'';
-  return '<tr><td class="rank">'+(st+i+1)+'</td>'+box+'<td><a href="'+u+'" target="_blank" rel="noopener">'+h1+'</a>'+(WF.has(r.path)?' <span class="wf">✓ Workflow</span>':'')+'<div style="color:#5F5E5A;font-size:11px">'+r.path+'</div></td>'+cc.map(c=>'<td class="num">'+c.f(r[c.k])+'</td>').join("")+'</tr>';
- }).join("");
+ document.querySelector("#pagesTable tbody").innerHTML=sl.map((r,i)=>{const h1=prettify(r.path),u="https://www.openmindsresources.com"+r.path;const box=editWf?`<td><input type="checkbox" class="wfbox" data-p="${r.path}" ${WF.has(r.path)?"checked":""}></td>`:'';return '<tr><td class="rank">'+(st+i+1)+'</td>'+box+'<td><a href="'+u+'" target="_blank" rel="noopener">'+h1+'</a>'+(WF.has(r.path)?' <span class="wf">✓ Workflow</span>':'')+'<div style="color:#5F5E5A;font-size:11px">'+r.path+'</div></td>'+cc.map(c=>'<td class="num">'+c.f(r[c.k])+'</td>').join("")+'</tr>';}).join("");
  document.getElementById("pageInfo").textContent=tot?(st+1)+"–"+Math.min(st+size,tot)+" of "+tot:"0";
  const pv=document.getElementById("pagePrev"),nx=document.getElementById("pageNext");
  pv.disabled=pidx<=0;nx.disabled=pidx>=np-1;pv.style.opacity=pv.disabled?".4":"1";nx.style.opacity=nx.disabled?".4":"1";
@@ -289,13 +355,12 @@ document.getElementById("pageSize").onchange=function(){psize=this.value==="all"
 document.getElementById("pagePrev").onclick=()=>{if(pidx>0){pidx--;renderPages();}};
 document.getElementById("pageNext").onclick=()=>{pidx++;renderPages();};
 document.getElementById("wfOnly").onchange=function(){wfo=this.checked;pidx=0;renderPages();};
-document.getElementById("editWf").onclick=function(){editWf=!editWf;this.textContent=editWf?"Done editing":"Edit workflow tags";document.getElementById("exportWf").style.display=editWf?"inline-block":"none";if(!editWf)document.getElementById("wfExport").style.display="none";renderPages();};
-document.getElementById("exportWf").onclick=function(){const ta=document.getElementById("wfExport");ta.style.display="block";ta.value=JSON.stringify([...WF].sort(),null,0);ta.focus();ta.select();};
+document.getElementById("editWf").onclick=function(){editWf=!editWf;this.textContent=editWf?"Done editing":"Edit workflow tags";this.classList.toggle("active",editWf);document.getElementById("exportWf").style.display=editWf?"inline-block":"none";if(!editWf)document.getElementById("wfExport").style.display="none";renderPages();};
+document.getElementById("exportWf").onclick=function(){const ta=document.getElementById("wfExport");ta.style.display="block";ta.value=JSON.stringify([...WF].sort());ta.focus();ta.select();};
 
-/* Channels */
 let chanC;
 function renderChan(){
- const mode=document.getElementById("chanMode").value,t=document.getElementById("chanTitle"),[a,b]=RANGE;
+ const mode=chanMode,t=document.getElementById("chanTitle"),[a,b]=RANGE;
  let rows;
  if(mode==="ai"){t.textContent="AI assistant referrals";const m=sumDim(DAILY.sm,a,b),agg={};Object.keys(m).forEach(sm=>{const src=sm.split(" / ")[0];if(isAI(src)){const f=friendlyAI(src);agg[f]=(agg[f]||0)+m[sm];}});rows=Object.keys(agg).map(k=>[k,agg[k]]).sort((x,y)=>y[1]-x[1]);}
  else if(mode==="sourcemedium"){t.textContent="Sessions by source / medium";const m=sumDim(DAILY.sm,a,b);rows=Object.keys(m).map(k=>[k,m[k]]).sort((x,y)=>y[1]-x[1]).slice(0,15);}
@@ -308,37 +373,45 @@ function renderChan(){
  if(chanC)chanC.destroy();
  chanC=new Chart(document.getElementById("channelChart"),{type:"bar",data:{labels:rows.map(r=>r[0]),datasets:[{label:"Sessions",data:rows.map(r=>r[1]),backgroundColor:rows.map((r,i)=>pal[i%pal.length])}]},options:{indexAxis:"y",responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{beginAtZero:true,ticks:{precision:0}}}}});
 }
-document.getElementById("chanMode").onchange=renderChan;
 
-/* Readers */
 function renderReaders(){
- const [a,b]=RANGE,m=sumDim(DAILY.nvr,a,b),nw=m["new"]||0,rt=m["returning"]||0,tot=nw+rt,ent=sumVal(DAILY.ent,a,b);
- const cur=totals(pgCache);
+ const [a,b]=RANGE,m=sumDim(DAILY.nvr,a,b),nw=m["new"]||0,rt=m["returning"]||0,tot=nw+rt,ent=sumVal(DAILY.ent,a,b),cur=totals(pgCache);
  const cards=[{lab:"New",bg:"#F3F9EC",lc:"#364F1A",vc:"#1B270D",val:nw,d:tot?Math.round(nw/tot*100)+"% of readers":""},{lab:"Returning",bg:"#EBF7FD",lc:"#18485C",vc:"#0C242E",val:rt,d:tot?Math.round(rt/tot*100)+"% return rate":""},{lab:"Blog-entry sessions",bg:"#FFF7E8",lc:"#966A0E",vc:"#64460A",val:ent,d:cur.sessions?Math.round(ent/cur.sessions*100)+"% start on a post":""}];
  document.getElementById("readersBody").innerHTML=cards.map(c=>`<div class="kpi" style="background:${c.bg}"><div class="lab" style="color:${c.lc}">${c.lab}</div><div class="val" style="color:${c.vc}">${c.val}</div><div class="delta" style="color:${c.lc}">${c.d}</div></div>`).join("");
 }
 
-/* fixed deep-dive sections render once */
 (function(){
- const list=(title,col,rows)=>`<div><div style="font-size:13px;font-weight:600;color:${col};margin-bottom:6px">${title}</div>`+rows.map(r=>{const path=r[0],prev=r[1],cur=r[2],delta=cur-prev,h1=prettify(path),u="https://www.openmindsresources.com"+path,sign=delta>0?"+":"";return `<div style="display:flex;justify-content:space-between;gap:10px;font-size:13px;padding:5px 0;border-bottom:1px solid var(--line)"><a href="${u}" target="_blank" rel="noopener" style="color:#185FA5;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${h1}</a><span style="white-space:nowrap;color:${col};font-weight:500">${sign}${delta} <span style="color:var(--muted);font-weight:400">(${prev}→${cur})</span></span></div>`;}).join("")+`</div>`;
+ const list=(title,col,rows)=>`<div><div style="font-size:13px;font-weight:600;color:${col};margin-bottom:6px">${title}</div>`+rows.map(r=>{const path=r[0],prev=r[1],cur=r[2],delta=cur-prev,h1=prettify(path),u="https://www.openmindsresources.com"+path,sign=delta>0?"+":"";return `<div style="display:flex;justify-content:space-between;gap:10px;font-size:13px;padding:5px 0;border-bottom:1px solid var(--line)"><a href="${u}" target="_blank" rel="noopener" style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${h1}</a><span style="white-space:nowrap;color:${col};font-weight:500">${sign}${delta} <span style="color:var(--muted);font-weight:400">(${prev}→${cur})</span></span></div>`;}).join("")+`</div>`;
  document.getElementById("moversBody").innerHTML=list("▲ Rising","#517626",FIXED.risers)+list("▼ Falling","#A32D2D",FIXED.fallers);
  let sdata=FIXED.search.map(r=>({q:r[0],clicks:r[1],impr:r[2],ctr:r[3],pos:r[4]})),gk="impr",gd="desc";
  function rs(){const cs=[{k:"clicks",l:"Clicks"},{k:"impr",l:"Impr."},{k:"ctr",l:"CTR"},{k:"pos",l:"Pos."}];const ar=k=>gk===k?(gd==="desc"?"▾":"▴"):"";document.querySelector("#searchTable thead").innerHTML='<tr><th class="rank"></th><th data-k="q">Query <span class="arr">'+ar("q")+'</span></th>'+cs.map(c=>`<th class="num" data-k="${c.k}">${c.l} <span class="arr">${ar(c.k)}</span></th>`).join("")+'</tr>';const dir=gd==="desc"?-1:1;const so=[...sdata].sort((a,b)=>{if(gk==="q")return a.q<b.q?dir:a.q>b.q?-dir:0;return (a[gk]-b[gk])*dir;}).slice(0,20);document.querySelector("#searchTable tbody").innerHTML=so.map((r,i)=>`<tr><td class="rank">${i+1}</td><td>${r.q}</td><td class="num">${r.clicks}</td><td class="num">${r.impr}</td><td class="num">${(r.ctr*100).toFixed(1)}%</td><td class="num">${r.pos.toFixed(1)}</td></tr>`).join("");document.querySelectorAll("#searchTable th[data-k]").forEach(th=>th.onclick=()=>{const k=th.getAttribute("data-k");if(gk===k)gd=gd==="desc"?"asc":"desc";else{gk=k;gd=k==="q"?"asc":"desc";}rs();});}
  rs();
  const nm=p=>prettify(p),url=p=>"https://www.openmindsresources.com"+p;
- document.getElementById("journeyBody").innerHTML=FIXED.journey.map((g,gi)=>{const gmax=g.dests[0][1],open=gi===0;const dests=g.dests.map(d=>{const pct=Math.max(6,Math.round(d[1]/gmax*100));return `<div style="display:flex;align-items:center;gap:10px;padding:4px 0 4px 22px"><span style="flex:none;color:#B4B2A9">↳</span><a href="${url(d[0])}" target="_blank" rel="noopener" style="flex:1 1 40%;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#185FA5;font-size:12.5px">${nm(d[0])}</a><div style="flex:1 1 30%;max-width:140px;height:8px;background:#EBF7FD;border-radius:4px;overflow:hidden"><div style="width:${pct}%;height:100%;background:#3BB3E7;border-radius:4px"></div></div><span style="flex:none;width:30px;text-align:right;font-size:12px;font-weight:500;color:#18485C">${d[1]}</span></div>`;}).join("");return `<div class="jcard"><div class="jhead"><span class="jchev" style="flex:none;color:var(--muted);font-size:11px;width:12px">${open?"▾":"▸"}</span><span style="flex:none;font-size:10px;font-weight:600;color:#fff;background:#E41672;padding:3px 8px;border-radius:20px">FROM</span><a href="${url(g.from)}" target="_blank" rel="noopener" style="font-size:13px;font-weight:600;color:#5B092E;text-decoration:none;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${nm(g.from)}</a><span style="flex:none;font-size:11px;color:var(--muted)">${g.dests.length} pages · ${g.total} clicks</span></div><div class="jbody" style="margin-top:8px;${open?"":"display:none"}">${dests}</div></div>`;}).join("");
+ document.getElementById("journeyBody").innerHTML=FIXED.journey.map((g,gi)=>{const gmax=g.dests[0][1],open=gi===0;const dests=g.dests.map(d=>{const pct=Math.max(6,Math.round(d[1]/gmax*100));return `<div style="display:flex;align-items:center;gap:10px;padding:4px 0 4px 22px"><span style="flex:none;color:#B4B2A9">↳</span><a href="${url(d[0])}" target="_blank" rel="noopener" style="flex:1 1 40%;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12.5px">${nm(d[0])}</a><div style="flex:1 1 30%;max-width:140px;height:8px;background:#EBF7FD;border-radius:4px;overflow:hidden"><div style="width:${pct}%;height:100%;background:#3BB3E7;border-radius:4px"></div></div><span style="flex:none;width:30px;text-align:right;font-size:12px;font-weight:500;color:#18485C">${d[1]}</span></div>`;}).join("");return `<div class="jcard"><div class="jhead"><span class="jchev" style="flex:none;color:var(--muted);font-size:11px;width:12px">${open?"▾":"▸"}</span><span style="flex:none;font-size:10px;font-weight:600;color:#fff;background:#E41672;padding:3px 8px;border-radius:20px">FROM</span><a href="${url(g.from)}" target="_blank" rel="noopener" style="font-size:13px;font-weight:600;color:#5B092E;text-decoration:none;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${nm(g.from)}</a><span style="flex:none;font-size:11px;color:var(--muted)">${g.dests.length} pages · ${g.total} clicks</span></div><div class="jbody" style="margin-top:8px;${open?"":"display:none"}">${dests}</div></div>`;}).join("");
  document.querySelectorAll("#journeyBody .jhead").forEach(h=>h.addEventListener("click",function(e){if(e.target.closest("a"))return;const b=this.nextElementSibling,ch=this.querySelector(".jchev"),o=b.style.display!=="none";b.style.display=o?"none":"block";ch.textContent=o?"▸":"▾";}));
  const a=FIXED.analysis,sc=(cls,ic,t,arr)=>`<div class="acard ${cls}"><h3>${ic} ${t}</h3><ul>${arr.map(x=>"<li>"+x+"</li>").join("")}</ul></div>`;
  document.getElementById("analysis").innerHTML=sc("aw","✓","What did well",a.did_well)+sc("ai2","△","What needs improvement",a.improve)+sc("an","→","Next action steps",a.actions);
 })();
 
-/* period control */
-const psel=document.getElementById("period");
-["Last 28 days","This month","Last month","Year to date","Custom…"].forEach(k=>{const o=document.createElement("option");o.value=k;o.textContent=k;psel.appendChild(o);});
 function setRange(a,b){RANGE=[a,b];pgCache=aggPages(a,b);pidx=0;document.getElementById("periodRange").textContent="· "+fmtFull(a)+" – "+fmtFull(b);renderKpis();renderTrend();renderPages();renderChan();renderReaders();}
-psel.onchange=function(){const v=this.value;const custom=v==="Custom…";document.getElementById("customWrap").style.display=custom?"inline-flex":"none";if(!custom){const r=presetRange(v);setRange(r[0],r[1]);}};
+
+/* period pills */
+document.querySelectorAll("#periodPills button").forEach(btn=>btn.addEventListener("click",function(){
+ document.querySelectorAll("#periodPills button").forEach(x=>x.classList.remove("active"));this.classList.add("active");
+ const v=this.getAttribute("data-p"),custom=v==="Custom…";
+ document.getElementById("customWrap").style.display=custom?"inline-flex":"none";
+ if(!custom){const r=presetRange(v);setRange(r[0],r[1]);}
+}));
 document.getElementById("applyCustom").onclick=function(){const cs=document.getElementById("cstart").value,ce=document.getElementById("cend").value;if(!cs||!ce)return;let a=parseInt(cs.replace(/-/g,""),10),b=parseInt(ce.replace(/-/g,""),10);if(b<a){const t=a;a=b;b=t;}setRange(a,b);};
-(function initCustom(){const f=function(n){const y=Math.floor(n/10000),m=String(Math.floor(n/100)%100).padStart(2,"0"),d=String(n%100).padStart(2,"0");return y+"-"+m+"-"+d;};document.getElementById("cstart").value=f(addDays(MAXD,-27));document.getElementById("cend").value=f(MAXD);})();
+(function initCustom(){const f=n=>{const y=Math.floor(n/10000),m=String(Math.floor(n/100)%100).padStart(2,"0"),d=String(n%100).padStart(2,"0");return y+"-"+m+"-"+d;};document.getElementById("cstart").value=f(addDays(MAXD,-27));document.getElementById("cend").value=f(MAXD);})();
+
+/* channel pills */
+document.querySelectorAll("#chanPills button").forEach(btn=>btn.addEventListener("click",function(){document.querySelectorAll("#chanPills button").forEach(x=>x.classList.remove("active"));this.classList.add("active");chanMode=this.getAttribute("data-c");renderChan();}));
+
+/* print + chip + scrollspy */
+document.getElementById("printBtn").onclick=()=>window.print();
+document.getElementById("updChip").innerHTML='<span class="lv"></span> Data through '+fmtFull(MAXD)+' · refreshes daily';
+(function spy(){const links={};document.querySelectorAll(".sidenav a").forEach(a=>links[a.getAttribute("data-s")]=a);const obs=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){Object.values(links).forEach(l=>l.classList.remove("active"));const l=links[e.target.id];if(l)l.classList.add("active");}});},{rootMargin:"-45% 0px -50% 0px"});["s-kpi","s-trend","s-pages","s-chan","s-readers","s-movers","s-search","s-journey","s-analysis"].forEach(id=>{const el=document.getElementById(id);if(el)obs.observe(el);});})();
 
 buildMetricsMenu();
 const r0=presetRange("Last 28 days");setRange(r0[0],r0[1]);
