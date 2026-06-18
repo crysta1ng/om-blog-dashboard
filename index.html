@@ -149,6 +149,7 @@ const AIP=["chatgpt","openai","gemini","bard","claude","perplexity","copilot","d
 function isAI(s){s=(s||"").toLowerCase();return AIP.some(x=>s.includes(x));}
 function friendlyAI(s){s=(s||"").toLowerCase();if(s.includes("chatgpt")||s.includes("openai"))return"ChatGPT";if(s.includes("gemini")||s.includes("bard"))return"Gemini";if(s.includes("claude"))return"Claude";if(s.includes("perplexity"))return"Perplexity";if(s.includes("copilot"))return"Copilot";if(s.includes("deepseek"))return"DeepSeek";if(s.includes("grok"))return"Grok";return s;}
 
+/*__DATA_START__*/
 const PERIODS={
 "Last 28 days":{range:"19 May – 15 Jun 2026",granularity:"Daily page views",
  kpi:{cur:[431,351,302,0.21083,77.957],prev:[180,173,161,0.15607,58.596]},
@@ -189,6 +190,7 @@ const FIXED={
  analysis:{did_well:["Blog traffic more than doubled: 431 page views (+139%) and 351 sessions (+103%) versus the previous 28 days, while engagement rate rose from 15.6% to 21.1% and average session from 59s to 78s.","A clear peak on 22 May (72 views — about 4.7× the daily average) drove much of the gain; “Offline Shopping Malaysia” was the biggest riser (+58) and the most engaged post.","Recent workflow posts performed: the TikTok Shop vs Shopee comparison (+38) and the Performance Marketing examples piece (+23) both entered the top four."],improve:["Traffic is over-reliant on Direct (~81% of sessions) and on the blog index as the single hub; Organic Search is only 56 despite 6,399 search impressions.","Several high-traffic posts show high bounce (TikTok vs Shopee 83%, Digitalisation 2026 80%), and article-to-article movement is rare.","Returning visitors are only ~13% of sessions; biggest decliners were “User Engagement: how to measure it” (−11) and “2025 Marketing Trends” (−10)."],actions:["Capture existing demand: strengthen and interlink the digitalisation pillar (‘digitalization in malaysia’ = 660 impressions, position ~22) and publish the AdTech vs MarTech and AI in Performance Marketing pieces.","Add stronger in-content ‘related article’ links to lift article-to-article journeys and returning visitors.","Set up a contact/lead key event in GA4 so future reports can tie content to leads, not just reads."]}
 };
 
+/*__DATA_END__*/
 const num=v=>Math.round(v);
 function fmtDur(s){s=Math.round(s);const m=Math.floor(s/60),ss=s%60;return m+"m "+String(ss).padStart(2,"0")+"s";}
 function fmtPct(v){return (v*100).toFixed(1)+"%";}
