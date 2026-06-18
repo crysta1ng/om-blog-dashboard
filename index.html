@@ -207,7 +207,7 @@ table.pages a{text-decoration:none;}
 
 <script>
 const PINK="#E41672",CYAN="#3BB3E7",AMBER="#FAB018",GREEN="#87C540",PINKL="#F4A2C7";
-const WORKFLOW_BASE=["/blog/free-shipping-ecommerce-strategy/","/blog/gen-z-buying-journey-malaysia/","/blog/offline-shopping-malaysia/","/blog/online-reviews-malaysia-trust/","/blog/t20-m40-b40-how-malaysians-shop/","/blog/tiktok-shop-vs-shopee-malaysia/","/blog/why-ads-dont-convert/","/blog/content-repurposing-strategy-playbook/","/blog/email-marketing-guide-2026/","/blog/whatsapp-channels-vs-broadcast/","/blog/ugc-creator-malaysia-cost-briefing-guide/","/blog/answer-engine-optimisation/","/blog/shopee-ads-vs-tiktok-shop-ads-malaysia/","/blog/google-search-redesign-2026/","/blog/marketing-jobs-malaysia-ai-2026/","/blog/best-llm-for-content-writing-2026/"];
+const WORKFLOW_BASE=["/blog/answer-engine-optimisation/","/blog/best-llm-for-content-writing-2026/","/blog/canva-ai-features-2026-malaysia/","/blog/claude-fable-5-anthropic-2026/","/blog/content-repurposing-strategy-playbook/","/blog/email-marketing-guide-2026/","/blog/free-shipping-ecommerce-strategy/","/blog/gen-z-buying-journey-malaysia/","/blog/google-search-redesign-2026/","/blog/looker-studio-vs-data-studio-2026/","/blog/marketing-jobs-malaysia-ai-2026/","/blog/offline-shopping-malaysia/","/blog/online-reviews-malaysia-trust/","/blog/shopee-ads-vs-tiktok-shop-ads-malaysia/","/blog/t20-m40-b40-how-malaysians-shop/","/blog/tiktok-shop-vs-shopee-malaysia/","/blog/ugc-creator-malaysia-cost-briefing-guide/","/blog/whatsapp-channels-vs-broadcast/","/blog/why-ads-dont-convert/"];
 const H1={
 "/blog/offline-shopping-malaysia/":"60% of Malaysians Still Shop Offline in 2026",
 "/blog/tiktok-shop-vs-shopee-malaysia/":"Shopee vs TikTok Shop vs Lazada: Where Malaysians Buy in 2026",
@@ -315,9 +315,10 @@ function renderTrend(){
 
 const PM=[{k:"views",l:"Views",f:v=>v},{k:"sessions",l:"Sessions",f:v=>v},{k:"users",l:"Users",f:v=>v},{k:"avgEng",l:"Avg engagement",f:fmtDur},{k:"engRate",l:"Engagement rate",f:fmtPct},{k:"bounce",l:"Bounce rate",f:fmtPct}];
 let cols=new Set(["views","sessions","users"]),colOrder=PM.map(m=>m.k),sk="views",sd="desc",psize=10,pidx=0,wfo=false,editWf=false;
+const WFBASE=new Set(WORKFLOW_BASE);
 let WF=loadWF();
-function loadWF(){try{const s=localStorage.getItem("om_wf");if(s)return new Set(JSON.parse(s));}catch(e){}return new Set(WORKFLOW_BASE);}
-function saveWF(){try{localStorage.setItem("om_wf",JSON.stringify([...WF].sort()));}catch(e){}}
+function loadWF(){const wf=new Set(WORKFLOW_BASE);try{const d=JSON.parse(localStorage.getItem("om_wf_delta")||"{}");(d.add||[]).forEach(p=>wf.add(p));(d.rem||[]).forEach(p=>wf.delete(p));}catch(e){}return wf;}
+function saveWF(){const add=[...WF].filter(p=>!WFBASE.has(p)),rem=[...WFBASE].filter(p=>!WF.has(p));try{localStorage.setItem("om_wf_delta",JSON.stringify({add,rem}));}catch(e){}}
 function buildMetricsMenu(){
  const menu=document.getElementById("metricsMenu");
  menu.innerHTML='<div class="mhint">Tick to show · drag ⠿ to reorder</div>'+colOrder.map(k=>{const mt=PM.find(m=>m.k===k);return `<div class="mrow" draggable="true" data-k="${k}"><span class="drag" aria-hidden="true">⠿</span><label><input type="checkbox" data-k="${k}" ${cols.has(k)?"checked":""}> ${mt.l}</label></div>`;}).join("");
