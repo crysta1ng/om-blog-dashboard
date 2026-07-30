@@ -11,19 +11,36 @@
   --ink:#e8edf3; --mut:#9aa7b5; --dim:#6b7885;
   --cyan:#22d3ee; --mag:#e857b0; --org:#ff9f45; --grn:#43d69a; --blue:#5b8cff;
   --shadow:0 1px 0 rgba(255,255,255,.03), 0 8px 30px rgba(0,0,0,.35);
+  --bg2:#0e141b; --grad1:#0b0e12; --grad2:#0e1116;
+  --grid:rgba(255,255,255,.05); --chartTrack:#222a34; --chartLabel:#9aa7b5; --onAccent:#0b0e12;
+}
+:root[data-theme="light"]{
+  --bg:#f6f8fb; --panel:#ffffff; --panel2:#eef2f7; --line:#dde3ea;
+  --ink:#0f1720; --mut:#566472; --dim:#8593a1;
+  --cyan:#0891b2; --mag:#c026a3; --org:#c2680a; --grn:#0f9d69; --blue:#2f6bff;
+  --shadow:0 1px 0 rgba(255,255,255,.6), 0 8px 30px rgba(15,23,32,.10);
+  --bg2:#eef2f7; --grad1:#f6f8fb; --grad2:#eceff4;
+  --grid:rgba(15,23,32,.08); --chartTrack:#e3e9f0; --chartLabel:#566472; --onAccent:#ffffff;
 }
 *{box-sizing:border-box}
-body{margin:0;background:linear-gradient(180deg,#0b0e12,#0e1116);color:var(--ink);
+body{margin:0;background:linear-gradient(180deg,var(--grad1),var(--grad2));color:var(--ink);
   font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;font-size:14px;line-height:1.45}
 a{color:var(--cyan);text-decoration:none}
 .wrap{max-width:1240px;margin:0 auto;padding:22px 20px 60px}
 header.top{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:14px}
 .brand{display:flex;align-items:center;gap:12px}
 .logo{height:34px;width:auto;display:flex;align-items:center}.logo img{height:26px;width:auto;display:block}
+.logo .logo-light{display:none}
+:root[data-theme="light"] .logo .logo-dark{display:none}
+:root[data-theme="light"] .logo .logo-light{display:block}
 .brand h1{font-size:17px;margin:0;font-weight:650;letter-spacing:.2px}
 .brand .sub{color:var(--dim);font-size:12px}
 .period{color:var(--mut);font-size:12px;text-align:right}
 .period b{color:var(--ink)}
+.headright{display:flex;align-items:center;gap:14px}
+.themebtn{appearance:none;cursor:pointer;display:inline-flex;align-items:center;gap:6px;background:var(--panel2);border:1px solid var(--line);color:var(--mut);border-radius:9px;padding:6px 11px;font:inherit;font-size:12px;font-weight:650;line-height:1;transition:color .15s,border-color .15s}
+.themebtn:hover{color:var(--ink);border-color:var(--cyan)}
+.themebtn .ic{font-size:13px;line-height:1}
 .tabs{display:flex;gap:6px;border-bottom:1px solid var(--line);margin:6px 0 20px;overflow-x:auto}
 .tab{appearance:none;border:0;background:transparent;color:var(--mut);font:inherit;font-weight:600;
   padding:11px 16px;border-radius:9px 9px 0 0;cursor:pointer;white-space:nowrap;position:relative;transition:.15s}
@@ -60,14 +77,14 @@ tbody tr:hover{background:rgba(255,255,255,.02)}
 .bars{margin-top:4px}
 .barrow{display:flex;align-items:center;gap:10px;margin:7px 0}
 .barrow .nm{width:150px;color:var(--mut);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.barrow .tk{flex:1;height:9px;background:#0e141b;border-radius:6px;overflow:hidden}
+.barrow .tk{flex:1;height:9px;background:var(--bg2);border-radius:6px;overflow:hidden}
 .barrow .fl{height:100%;border-radius:6px;background:linear-gradient(90deg,var(--cyan),var(--blue))}
 .barrow .vv{width:44px;text-align:right;font-variant-numeric:tabular-nums;color:var(--ink);font-size:12px}
-.seg{display:inline-flex;background:#0e141b;border:1px solid var(--line);border-radius:9px;padding:3px}
+.seg{display:inline-flex;background:var(--bg2);border:1px solid var(--line);border-radius:9px;padding:3px}
 .seg button{appearance:none;border:0;background:transparent;color:var(--mut);font:inherit;font-weight:650;
   padding:5px 12px;border-radius:7px;cursor:pointer;font-size:12.5px}
 .seg button.on{background:var(--panel2);color:var(--ink);box-shadow:0 1px 0 rgba(255,255,255,.05) inset}
-.dt{background:#0e141b;border:1px solid var(--line);color:var(--ink);border-radius:7px;padding:4px 7px;font:inherit;font-size:12px}
+.dt{background:var(--bg2);border:1px solid var(--line);color:var(--ink);border-radius:7px;padding:4px 7px;font:inherit;font-size:12px}
 .minibtn{appearance:none;background:var(--panel2);border:1px solid var(--line);color:var(--ink);border-radius:7px;padding:5px 11px;font:inherit;font-size:12px;font-weight:650;cursor:pointer}
 .minibtn:hover:not(:disabled){border-color:var(--cyan)}
 .minibtn:disabled{opacity:.35;cursor:default}
@@ -86,7 +103,7 @@ tbody tr:hover{background:rgba(255,255,255,.02)}
 .note{background:linear-gradient(180deg,rgba(232,87,176,.08),rgba(34,211,238,.06));border:1px solid var(--line);
   border-radius:12px;padding:14px 16px;font-size:13px;color:var(--mut)}
 .note b{color:var(--ink)}
-.cta{display:inline-block;margin-top:10px;background:linear-gradient(90deg,var(--mag),var(--org));color:#0b0e12;
+.cta{display:inline-block;margin-top:10px;background:linear-gradient(90deg,var(--mag),var(--org));color:var(--onAccent);
   font-weight:750;padding:9px 16px;border-radius:10px;font-size:13px}
 .small{font-size:12px;color:var(--dim)}
 ul.an{margin:6px 0 0;padding-left:18px}
@@ -98,7 +115,7 @@ ul.an li b{color:var(--ink)}
 .hint{cursor:help;border-bottom:1px dotted rgba(255,255,255,.28)}
 [data-tip]{position:relative}
 [data-tip]:hover::after{content:attr(data-tip);position:absolute;left:0;top:135%;z-index:60;
-  width:max-content;max-width:250px;background:#0b0e12;border:1px solid var(--line);color:var(--ink);
+  width:max-content;max-width:250px;background:var(--panel2);border:1px solid var(--line);color:var(--ink);
   padding:8px 10px;border-radius:9px;font-size:11.5px;font-weight:500;line-height:1.45;letter-spacing:0;
   text-transform:none;box-shadow:0 10px 28px rgba(0,0,0,.55);white-space:normal;pointer-events:none}
 [data-tip]:hover::before{content:"";position:absolute;left:14px;top:128%;z-index:60;border:5px solid transparent;border-bottom-color:var(--line);pointer-events:none}
@@ -117,15 +134,18 @@ th.srt:hover{color:var(--ink)}
 <div class="wrap">
   <header class="top">
     <div class="brand">
-      <div class="logo"><img src="https://www.openmindsresources.com/wp-content/uploads/2026/01/om-logo-white.png" alt="OpenMinds"></div>
+      <div class="logo"><img class="logo-dark" src="https://www.openmindsresources.com/wp-content/uploads/2026/01/om-logo-white.png" alt="OpenMinds"><img class="logo-light" src="https://www.openmindsresources.com/wp-content/uploads/2022/09/openminds-logo-r-color.svg" alt="OpenMinds"></div>
       <div>
         <h1>Blog Performance</h1>
         <div class="sub">openmindsresources.com/blog · SEO → GEO intelligence</div>
       </div>
     </div>
-    <div class="period">
-      <div>Data window <b id="dataWindow">—</b></div>
-      <div class="subtle" id="genStamp">—</div>
+    <div class="headright">
+      <button id="themeToggle" class="themebtn" type="button" aria-label="Toggle light or dark theme"><span class="ic" id="themeIcon">☾</span><span id="themeLabel">Dark</span></button>
+      <div class="period">
+        <div>Data window <b id="dataWindow">—</b></div>
+        <div class="subtle" id="genStamp">—</div>
+      </div>
     </div>
   </header>
 
@@ -297,6 +317,8 @@ const GENERATED="30 Jul 2026";
 /*__DATA_END__*/
 
 const $=id=>document.getElementById(id);
+const cv=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+(function(){try{var m=localStorage.getItem('omTheme');if(m==='light'||m==='dark')document.documentElement.dataset.theme=m;}catch(e){}})();
 const nf=n=>Number(n).toLocaleString('en-US');
 const pf=n=>(n>=0?'+':'')+n.toFixed(1)+'%';
 const esc=s=>String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
@@ -397,8 +419,9 @@ const cur=agg(CUR_S,CUR_E), prv=agg(PRV_S,PRV_E);
 function delta(a,b){if(!b)return null;return (a-b)/b*100;}
 
 const PALETTE=['#22d3ee','#e857b0','#ff9f45','#43d69a','#5b8cff','#b57bff','#f4d35e','#7fd1ff'];
-Chart.defaults.color='#9aa7b5';Chart.defaults.font.family="-apple-system,Segoe UI,Roboto,sans-serif";
-Chart.defaults.borderColor='rgba(255,255,255,.05)';
+Chart.defaults.font.family="-apple-system,Segoe UI,Roboto,sans-serif";
+function setChartDefaults(){Chart.defaults.color=cv('--chartLabel');Chart.defaults.borderColor=cv('--grid');}
+setChartDefaults();
 
 $('dataWindow').textContent=diLabel(MINDI)+' – '+diLabel(MAXDI);
 $('genStamp').textContent='Generated '+GENERATED;
@@ -441,13 +464,13 @@ function lineChart(id,labels,datasets){
   charts[id]=new Chart($(id),{type:'line',data:{labels,datasets},options:{
     responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
     plugins:{legend:{display:datasets.length>1,labels:{boxWidth:10,boxHeight:10,usePointStyle:true}}},
-    scales:{x:{grid:{display:false},ticks:{maxTicksLimit:8}},y:{beginAtZero:true,grid:{color:'rgba(255,255,255,.05)'}}},
+    scales:{x:{grid:{display:false},ticks:{maxTicksLimit:8}},y:{beginAtZero:true,grid:{color:cv('--grid')}}},
     elements:{point:{radius:0,hitRadius:12},line:{tension:.32,borderWidth:2}}
   }});
 }
 function doughnut(id,labels,vals){
   if(charts[id])charts[id].destroy();
-  charts[id]=new Chart($(id),{type:'doughnut',data:{labels,datasets:[{data:vals,backgroundColor:PALETTE,borderColor:'#161b22',borderWidth:2}]},
+  charts[id]=new Chart($(id),{type:'doughnut',data:{labels,datasets:[{data:vals,backgroundColor:PALETTE,borderColor:cv('--panel'),borderWidth:2}]},
     options:{responsive:true,maintainAspectRatio:false,cutout:'62%',plugins:{legend:{display:false}}}});
 }
 function legendHtml(el,labels,vals){
@@ -535,7 +558,7 @@ function sePositions(){
 function aiGauge(){
   const sc=AIVIS.readiness;const col=sc>=70?'#43d69a':(sc>=40?'#ff9f45':'#e857b0');
   charts['aiGauge']&&charts['aiGauge'].destroy();
-  charts['aiGauge']=new Chart($('aiGauge'),{type:'doughnut',data:{datasets:[{data:[sc,100-sc],backgroundColor:[col,'#222a34'],borderWidth:0}]},
+  charts['aiGauge']=new Chart($('aiGauge'),{type:'doughnut',data:{datasets:[{data:[sc,100-sc],backgroundColor:[col,cv('--chartTrack')],borderWidth:0}]},
     options:{cutout:'76%',rotation:-90,circumference:360,plugins:{legend:{display:false},tooltip:{enabled:false}},responsive:false}});
   $('aiScore').textContent=sc;
 }
@@ -619,7 +642,7 @@ function renderCompare(){
     datasets:[{label:'Workflow',data:[W.v28,W.vAll],backgroundColor:'#22d3ee',borderRadius:5},
               {label:'Manual',data:[M.v28,M.vAll],backgroundColor:'#ff9f45',borderRadius:5}]},
     options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
-      scales:{y:{beginAtZero:true,grid:{color:'rgba(255,255,255,.05)'}},x:{grid:{display:false}}}}});
+      scales:{y:{beginAtZero:true,grid:{color:cv('--grid')}},x:{grid:{display:false}}}}});
   $('cmpLeg').innerHTML='<span><i class="dot" style="background:#22d3ee"></i>Workflow</span><span><i class="dot" style="background:#ff9f45"></i>Manual</span>';
 }
 const artCols=[
@@ -687,6 +710,22 @@ $('cmpFilter').addEventListener('click',e=>{const b=e.target.closest('button');i
 $('cmpReset').addEventListener('click',()=>{overrides={};saveOverrides();if(_sort['cmpArticles'])_sort['cmpArticles'].page=0;refreshCompare();});
 
 $('gFrom').min=$('gTo').min=diToInput(MINDI); $('gFrom').max=$('gTo').max=diToInput(MAXDI);
+function setTheme(mode){
+  document.documentElement.dataset.theme=mode;
+  try{localStorage.setItem('omTheme',mode)}catch(e){}
+  var tl=$('themeLabel'),ic=$('themeIcon');
+  if(tl)tl.textContent=mode==='light'?'Light':'Dark';
+  if(ic)ic.textContent=mode==='light'?'☀':'☾';
+  if(window.Chart){setChartDefaults();
+    Object.keys(charts).forEach(function(k){try{charts[k].destroy()}catch(e){}delete charts[k];});
+    for(var k in rendered)delete rendered[k];
+    renderTab(activeTab); setTimeout(resizeTab,40);
+  }
+}
+$('themeToggle').addEventListener('click',function(){
+  setTheme(document.documentElement.dataset.theme==='light'?'dark':'light');
+});
+(function(){var m=document.documentElement.dataset.theme||'dark';var tl=$('themeLabel'),ic=$('themeIcon');if(tl)tl.textContent=m==='light'?'Light':'Dark';if(ic)ic.textContent=m==='light'?'☀':'☾';})();
 $('gFrom').value=diToInput(resolvePreset('28')[0]); $('gTo').value=diToInput(MAXDI);
 applyPeriod(resolvePreset('28'));
 </script>
