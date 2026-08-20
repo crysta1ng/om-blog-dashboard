@@ -507,6 +507,21 @@ function ovTrend(range){
   const s=dailySeries(range[0],range[1]);
   lineChart('ovTrend',s.days.map(diLabel),[{label:'Page views',data:s.views,borderColor:'#22d3ee',backgroundColor:'rgba(34,211,238,.12)',fill:true}]);
 }
+const valueLabels={id:'valueLabels',afterDatasetsDraw(chart){
+  const {ctx,chartArea}=chart; ctx.save();
+  ctx.font="600 11px -apple-system,Segoe UI,Roboto,sans-serif"; ctx.textAlign='center';
+  ctx.fillStyle=cv('--mut')||'#8b97a8';
+  chart.data.datasets.forEach((ds,di)=>{
+    const meta=chart.getDatasetMeta(di); if(meta.hidden)return;
+    meta.data.forEach((el,i)=>{
+      const v=ds.data[i]; if(v==null)return;
+      const above=el.y-6>=chartArea.top+12;
+      ctx.textBaseline=above?'bottom':'top';
+      ctx.fillText(nf(v),el.x,above?el.y-6:el.y+6);
+    });
+  });
+  ctx.restore();
+}};
 function monthlySeries(){
   const m={};
   for(const r of DAILY.rows){const k=Math.floor(r[0]/100);m[k]=(m[k]||0)+r[2];}
@@ -522,7 +537,7 @@ function ovMonthly(){
   const labels=s.keys.map(k=>{const mo=MONTH_ABBR[(k%100)-1];return s.multiYear?mo+" '"+String(Math.floor(k/100)).slice(2):mo;});
   const part=s.keys.map(k=>s.partial&&k===s.lastKey);
   if(charts['ovMonthly'])charts['ovMonthly'].destroy();
-  charts['ovMonthly']=new Chart($('ovMonthly'),{type:'bar',
+  charts['ovMonthly']=new Chart($('ovMonthly'),{type:'bar',plugins:[valueLabels],
     data:{labels,datasets:[{label:'Page views',data:s.vals,borderRadius:5,maxBarThickness:64,
       backgroundColor:part.map(p=>p?'rgba(34,211,238,.35)':'#22d3ee'),
       borderColor:'#22d3ee',borderWidth:part.map(p=>p?1.5:0)}]},
@@ -625,7 +640,7 @@ function aiMonthly(){
   const dim=new Date(Date.UTC(Math.floor(lastKey/100),lastKey%100,0)).getUTCDate();
   const partial=(MAXDI%100)<dim&&s.keys[s.keys.length-1]===lastKey;
   if(charts['aiMonthly'])charts['aiMonthly'].destroy();
-  charts['aiMonthly']=new Chart($('aiMonthly'),{type:'line',
+  charts['aiMonthly']=new Chart($('aiMonthly'),{type:'line',plugins:[valueLabels],
     data:{labels,datasets:[{label:'AI sessions',data:s.vals,borderColor:'#b57bff',
       backgroundColor:'rgba(181,123,255,.14)',fill:true,pointRadius:3,pointHoverRadius:5,pointBackgroundColor:'#b57bff'}]},
     options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
