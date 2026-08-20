@@ -248,6 +248,10 @@ th.srt:hover{color:var(--ink)}
       </div>
     </div>
     <div class="card" style="margin-top:14px">
+      <div class="flex"><h3>AI assistant sessions by month</h3><span class="small" id="aiMonthlyNote"></span></div>
+      <div class="chartbox"><canvas id="aiMonthly"></canvas></div>
+    </div>
+    <div class="card" style="margin-top:14px">
       <h3>Where AI sends visitors <span class="subtle" id="aiCiteWin" style="font-weight:400"></span></h3>
       <div class="grid g-2" style="gap:14px">
         <div>
@@ -605,6 +609,37 @@ function aiCiteAgg(){
   const pages=Object.keys(pg).map(k=>{const v=pg[k];return [k,v[0],v[0]?Math.round(100*v[1]/v[0]):0,v[0]?Math.round(v[2]/v[0]):0];}).sort((x,y)=>y[1]-x[1]);
   return {win:fmtD(s)+' – '+fmtD(e),total,platforms,pages};
 }
+function aiMonthlySeries(){
+  const d=(AIVIS.aicite&&AIVIS.aicite.daily)||[];
+  const m={};
+  for(const r of d){const k=Math.floor(r[0]/100);m[k]=(m[k]||0)+r[3];}
+  const keys=Object.keys(m).map(Number).sort((a,b)=>a-b);
+  return {keys,vals:keys.map(k=>m[k])};
+}
+function aiMonthly(){
+  const s=aiMonthlySeries();
+  if(!s.keys.length){$('aiMonthlyNote').textContent='no AI referral data yet';return;}
+  const multiYear=new Set(s.keys.map(k=>Math.floor(k/100))).size>1;
+  const labels=s.keys.map(k=>{const mo=MONTH_ABBR[(k%100)-1];return multiYear?mo+" '"+String(Math.floor(k/100)).slice(2):mo;});
+  const lastKey=Math.floor(MAXDI/100);
+  const dim=new Date(Date.UTC(Math.floor(lastKey/100),lastKey%100,0)).getUTCDate();
+  const partial=(MAXDI%100)<dim&&s.keys[s.keys.length-1]===lastKey;
+  if(charts['aiMonthly'])charts['aiMonthly'].destroy();
+  charts['aiMonthly']=new Chart($('aiMonthly'),{type:'line',
+    data:{labels,datasets:[{label:'AI sessions',data:s.vals,borderColor:'#b57bff',
+      backgroundColor:'rgba(181,123,255,.14)',fill:true,pointRadius:3,pointHoverRadius:5,pointBackgroundColor:'#b57bff'}]},
+    options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:function(c){
+        const i=c.dataIndex,v=s.vals[i],pv=i>0?s.vals[i-1]:0;
+        const g=pv?Math.round((v-pv)/pv*100):null;
+        return nf(v)+' AI sessions'+(g===null?'':'  ('+(g>=0?'+':'')+g+'% vs prev month)')+((partial&&i===s.vals.length-1)?'  · partial month':'');
+      }}}},
+      scales:{x:{grid:{display:false}},y:{beginAtZero:true,grid:{color:cv('--grid')}}},
+      elements:{line:{tension:.32,borderWidth:2}}}});
+  const last=labels[labels.length-1];
+  $('aiMonthlyNote').textContent=labels[0]+' – '+last+' '+Math.floor(s.keys[s.keys.length-1]/100)
+    +(partial?' · '+last+' partial (1–'+(MAXDI%100)+')':'')+' · full history, not affected by the date filter';
+}
 function aiCitedRender(){
   const a=aiCiteAgg(); if(!a)return;
   $('aiCiteWin').textContent='· '+a.win;
@@ -617,7 +652,7 @@ function aiCitedRender(){
   ],a.pages,{defaultCol:1,defaultDir:'desc',pageSize:12});
 }
 function aiRender(){
-  aiGauge(); aiCitedRender();
+  aiGauge(); aiCitedRender(); aiMonthly();
   const c=AIVIS.components, s=AIVIS.semrush, t=AIVIS.totals, ar=AIVIS.articles;
   barsHtml($('aiComp'),[['Question reach',Math.round(c.question_reach)],['Page-1 ratio',Math.round(c.page1_ratio)],['AI SERP presence',Math.round(c.ai_serp_presence)],['Coverage',Math.round(c.coverage)]]);
   $('aiAio').textContent=s.ai_overview_my; $('aiAioUs').textContent='US market: '+s.ai_overview_us;
