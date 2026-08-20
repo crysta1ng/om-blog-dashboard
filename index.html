@@ -173,6 +173,10 @@ th.srt:hover{color:var(--ink)}
 
   <section class="panel-tab active" id="tab-overview">
     <div class="grid g-kpi" id="kpis"></div>
+    <div class="card" style="margin-top:14px">
+      <div class="flex"><h3>Monthly blog page views</h3><span class="small" id="ovMonthlyNote"></span></div>
+      <div class="chartbox"><canvas id="ovMonthly"></canvas></div>
+    </div>
     <div class="grid g-3" style="margin-top:14px">
       <div class="card">
         <div class="flex"><h3>Daily blog page views</h3><span class="small" id="ovTrendRange"></span></div>
@@ -499,6 +503,36 @@ function ovTrend(range){
   const s=dailySeries(range[0],range[1]);
   lineChart('ovTrend',s.days.map(diLabel),[{label:'Page views',data:s.views,borderColor:'#22d3ee',backgroundColor:'rgba(34,211,238,.12)',fill:true}]);
 }
+function monthlySeries(){
+  const m={};
+  for(const r of DAILY.rows){const k=Math.floor(r[0]/100);m[k]=(m[k]||0)+r[2];}
+  const keys=Object.keys(m).map(Number).sort((a,b)=>a-b);
+  const multiYear=new Set(keys.map(k=>Math.floor(k/100))).size>1;
+  const lastKey=Math.floor(MAXDI/100);
+  const dim=new Date(Date.UTC(Math.floor(lastKey/100),lastKey%100,0)).getUTCDate();
+  return {keys,vals:keys.map(k=>m[k]),multiYear,lastKey,dim,lastDay:MAXDI%100,partial:(MAXDI%100)<dim};
+}
+const MONTH_ABBR=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+function ovMonthly(){
+  const s=monthlySeries();
+  const labels=s.keys.map(k=>{const mo=MONTH_ABBR[(k%100)-1];return s.multiYear?mo+" '"+String(Math.floor(k/100)).slice(2):mo;});
+  const part=s.keys.map(k=>s.partial&&k===s.lastKey);
+  if(charts['ovMonthly'])charts['ovMonthly'].destroy();
+  charts['ovMonthly']=new Chart($('ovMonthly'),{type:'bar',
+    data:{labels,datasets:[{label:'Page views',data:s.vals,borderRadius:5,maxBarThickness:64,
+      backgroundColor:part.map(p=>p?'rgba(34,211,238,.35)':'#22d3ee'),
+      borderColor:'#22d3ee',borderWidth:part.map(p=>p?1.5:0)}]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:function(c){
+        const i=c.dataIndex,v=s.vals[i],pv=i>0?s.vals[i-1]:0;
+        const g=pv?Math.round((v-pv)/pv*100):null;
+        return nf(v)+' page views'+(g===null?'':'  ('+(g>=0?'+':'')+g+'% vs prev month)')+(part[i]?'  · partial month':'');
+      }}}},
+      scales:{x:{grid:{display:false}},y:{beginAtZero:true,grid:{color:cv('--grid')}}}}});
+  const last=labels[labels.length-1];
+  $('ovMonthlyNote').textContent=labels[0]+' – '+last+' '+Math.floor(s.lastKey/100)
+    +(s.partial?' · '+last+' partial (1–'+s.lastDay+')':'')+' · full history, not affected by the date filter';
+}
 function ovChannels(range){
   const m=sumBy(DAILY.chan,range[0],range[1],1,2);
   const ent=Object.entries(m).sort((a,b)=>b[1]-a[1]).slice(0,7);
@@ -682,7 +716,7 @@ function coRender(){
 
 const rendered={}; let activeTab='overview'; let PERIOD=[MINDI,MAXDI];
 function fmtD(i){const d=diToDate(i);return d.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric',timeZone:'UTC'});}
-function renderOverview(){renderKpis(PERIOD[0],PERIOD[1]);ovTrend(PERIOD);ovChannels(PERIOD);topPages(PERIOD);
+function renderOverview(){renderKpis(PERIOD[0],PERIOD[1]);ovTrend(PERIOD);ovMonthly();ovChannels(PERIOD);topPages(PERIOD);
   $('ovTrendRange').textContent=fmtD(PERIOD[0])+' – '+fmtD(PERIOD[1]);}
 function renderTraffic(){trTrend(PERIOD);trChannels(PERIOD);trNvr(PERIOD);trSm(PERIOD);trEnt(PERIOD);
   $('trTrendRange').textContent=fmtD(PERIOD[0])+' – '+fmtD(PERIOD[1]);}
